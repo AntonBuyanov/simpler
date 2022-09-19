@@ -24,6 +24,14 @@ module Simpler
 
     private
 
+    def status(status)
+      @response.status = status
+    end
+
+    def headers
+      @response.headers
+    end
+
     def extract_name
       self.class.name.match('(?<name>.+)Controller')[:name].downcase
     end
@@ -47,8 +55,13 @@ module Simpler
     end
 
     def render(template)
+      if template.is_a?(String)
+        headers['Content-Type'] = 'text/html'
+      elsif template.is_a?(Hash) && template.has_key?(:plain)
+        headers['Content-Type'] = 'text/plain'
+      end
+
       @request.env['simpler.template'] = template
     end
-
   end
 end
